@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title>Hello MUI</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+		<!--标准mui.css-->
+		<link rel="stylesheet" href="../css/mui.min.css">
+		<link rel="stylesheet" href="../css/icons-extra.css">
+		<link rel="stylesheet" href="../css/font-awesome.min.css">
+	</head>
+
+	<body>
+
+		<style>
+			.mui-control-content {
+				background-color: white;
+				min-height: 215px;
+			}
+			.mui-control-content .mui-loading {
+				margin-top: 50px;
+			}
+			body {
+				background-color: #efeff4;
+			}
+			.mui-bar .mui-pull-left .mui-icon {
+				padding-right: 5px;
+				font-size: 28px;
+			}
+			.mui-bar .mui-btn {
+				font-weight: normal;
+				font-size: 17px;
+			}
+			.mui-bar .mui-btn-link {
+				top: 1px;
+			}
+			.mui-collapse-content p{
+				display:block;
+				min-height:25px;
+			}
+			.title{
+				margin: 20px 15px 7px;
+				color: #6d6d72;
+				font-size: 15px;
+			}
+			
+			.mui-content{
+				background:#ffffff;
+			}
+			.new-card{
+				font-size: 14px;
+			    position: relative;
+			    overflow: hidden;
+			    margin: 10px;
+			    border-radius: 2px;
+			    background-color: #fff;
+			    background-clip: padding-box;
+			}
+			.mui-icon{
+				font-size:18px;
+			}
+			.mui-table-view-cell>a:not(.mui-btn){
+				margin:-18px -15px !important;
+			}
+			.views{
+				width:30px;display: inline-block;
+			}
+			.mui-table-view-cell>a:not(.mui-btn){
+				padding:18px 15px 11px 15px; !important;
+			}
+			.result-no{
+				    width: 300px;
+				    height: 600px;
+				    text-align: center;
+				    line-height: 300px;
+				    font-size: 16px;
+				    color: #6C6C6C;
+			}
+			.mui-circle{
+				    width: 8px;
+    height: 8px;
+    padding: 0;
+    border-radius: 50%;
+        position: relative;
+    display: inline-block;
+    font-size: 12px;
+    text-align: center;
+    top:-2px;
+    margin-right:10px;
+			}
+		</style>
+		<header class="mui-bar mui-bar-nav">
+			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+			<h1 class="mui-title">足迹记录</h1>
+		</header>
+		<div class="mui-content">
+			<div id="slider" class="mui-slider mui-fullscreen">
+				<div id="sliderSegmentedControl" class="mui-slider-indicator mui-segmented-control mui-segmented-control-inverted">
+					<a class="mui-control-item" href="#item1mobile">
+				足迹
+			</a>
+					<a class="mui-control-item" href="#item2mobile">
+				轨迹
+			</a>
+					<a class="mui-control-item" href="#item3mobile">
+				世界足迹
+			</a>
+				</div>
+				<div id="sliderProgressBar" class="mui-slider-progress-bar mui-col-xs-4"></div>
+				<div class="mui-slider-group">
+					<div id="item1mobile" class="mui-slider-item mui-control-content mui-active">
+						<div id="scroll1" class="mui-scroll-wrapper">
+							<div class="mui-scroll">
+						</div>
+						</div>
+					</div>
+					<div id="item2mobile" class="mui-slider-item mui-control-content">
+						<div id="scroll2" class="mui-scroll-wrapper">
+							<div class="mui-scroll">
+								<div class="mui-loading">
+									<div class="mui-spinner">
+									
+									</div>
+								</div>
+							</div>
+						</div>
+
+					</div>
+					<div id="item3mobile" class="mui-slider-item mui-control-content">
+						<div id="scroll3" class="mui-scroll-wrapper">
+							<div class="mui-scroll">
+								<div class="mui-loading">
+									<div class="mui-spinner">
+									</div>
+								</div>
+							</div>
+						</div>
+
+					</div>
+				</div>
+			</div>
+		</div>
+		<script src="../js/mui.min.js"></script>
+		<script src="../js/jquery.js"></script>
+<script src="../js/app.js"></script>
+		<script>
+			mui.init({
+				swipeBack: false
+			});
+	var msg=false;
+	(function(){
+	  	var url="http://192.168.43.189:88/zujidata/index.php";
+	    var state=app.getState();
+	    var account=state.account;
+	mui('.mui-scroll-wrapper').scroll({
+			indicators: true //是否显示滚动条
+		});
+	mui.ajax(url,{
+		type:"post",
+		crossDomain:true,
+		dataType: 'json',
+		data:{
+			uname:account
+		},
+		success:function(data){
+			var html="";
+			msg=true;
+			var add_html=$("div.mui-content #scroll1 .mui-scroll");
+		for(var i in data){			
+			var image=data[i].dimage==""?'../images/cbd.jpg':data[i].dimage;
+			  html+=`<div class="mui-card">
+			  <div class="" style="width:100%" onclick="">
+			  <a href="show_zuji.html?did=${data[i].did}">
+				<div class="mui-card-header mui-card-media" style="height:200px;background:no-repeat center url(${image});background-size: cover;width: 100%;"></div>
+				</a></div>
+				<div class="mui-card-content">
+					<div class="mui-card-content-inner">
+						<p>${data[i].dtime}&nbsp;&nbsp;`;
+						if(data[i].dminutes<60){
+							html+=`<span class="fa fa-clock-o" style="color:#FF6100"></span>`;
+						}
+						else if(data[i].dminutes>60&&data[i].dminutes<360){
+							html+=`<span class="fa fa-clock-o" style="color:#00CD00"></span>`;
+						}
+						else{
+							html+=`<span class="fa fa-clock-o" style="color:#CD0000"></span>`;
+						}
+				html+=`${data[i].dminutes>0?"停留"+(data[i].dminutes>60?data[i].dminutes/60+"小时"+(data[i].dminutes%60>0?data[i].dminutes%60+"分钟":""):data[i].dminutes+"分钟"):""}</p>
+						<span style="color: #333;">${state.account} · ${data[i].dplace==null?'空白':data[i].dplace} · 被点赞${data[i].dlike==null?0:data[i].dlike}次</span>						
+						<ul class="mui-table-view">				
+					<li class="mui-table-view-cell mui-collapse">
+						<a class="mui-navigate-right" href="#">
+						<p style="color: #333;">${data[i].dtitle}</p>
+						</a>
+						<div class="mui-collapse-content">							
+							<p>
+								<label>状态:</label>${data[i].isSee==1?"所有人可查看":"别人不可查看"}
+							</p>
+							<p>
+								<label>同伴:</label>${data[i].dfriend?data[i].dfriend:"未记录"}
+							</p>
+							<p>
+								<label>住宿:</label>${data[i].dhouse?data[i].dhouse:"未记录"}
+							</p>
+							<p>
+								<label>餐饮:</label>${data[i].dfood?data[i].dfood:"未记录"}
+							</p>
+							<p>
+								<label>游记:</label>${data[i].drecord?data[i].drecord:"未记录"}
+							</p>
+						</div>
+					</li>
+				</ul>
+				</div>
+				</div>
+				<div class="mui-card-footer">
+					<a class="update" data-upid="${data[i].did}" href="update_view.html?did=${data[i].did}">
+					<span class="mui-icon mui-icon-compose "></span>
+					</a>
+					<a class="del" data-myid="${data[i].did}" onclick="del(${data[i].did})">
+					<span class="mui-icon mui-icon-trash"></span>
+					</a>
+				</div>
+			</div>`;
+		}
+		add_html.append(html);
+		},
+		error:function(xhr,type,errorThrown){
+			mui.alert(type);
+			}	      		
+	});	
+	
+	var html2 = '';
+	var html3 = '';
+	var item2 = document.getElementById('item2mobile');
+	var item3 = document.getElementById('item3mobile');
+	var state=app.getState();
+	var uname=state.account;
+	var msg1=false;
+	     var url="http://192.168.43.189:88/zujidata/show_route.php";
+		mui.ajax(url,{
+		type:"get",
+		data:{
+			uname:uname
+		},
+		crossDomain:true,
+		dataType: 'json',
+		success:function(data){
+			html2+=`<ul style="margin-left:-35px;margin-top:-50px">`;
+		for(var i in data){
+			  html2+=`
+					<li class="mui-table-view-cell"  style="border-bottom:1px solid #ddd;">
+						<a class="mui-navigate-right" data-rid="${data[i].rid}">
+							<div class="views">`;
+							if(data[i].rtime<60){
+								html2+=`<span class="mui-icon-extra mui-icon-extra-lamp" style="font-size:25px;color:#FF6100;"></span>`;
+						}
+						else if(data[i].rtime>60&&data[i].rtime<360){
+								html2+=`<span class="mui-icon-extra mui-icon-extra-lamp" style="font-size:25px;color:#00CD00;"></span>`;
+						}
+						else{
+								html2+=`<span class="mui-icon-extra mui-icon-extra-lamp" style="font-size:25px;color:#CD0000;"></span>`;
+						}
+							html2+=`<p>&nbsp;</p>
+							</div>
+							<div class="mui-media-body" style="display: inline-block;">
+								<p style="color:#000;">
+								<span class="mui-badge-success mui-circle"></span>
+								${data[i].rstart}
+								</p>
+								<p style="color:#000;">
+								<span class="mui-circle mui-badge-danger"></span>
+								${data[i].rend}
+								</p>
+								<p class="mui-ellipsis" style="color:#B5B5B5;font-size:12px;overflow: hidden; text-overflow: ellipsis; white-space: nowrap;width: 20em;">
+									<span>${data[i].rstart_time}</span>&nbsp;
+									<span class="fa fa-map-marker"></span>
+									<span>${Math.round(data[i].rdistance)}km</span>&nbsp;&nbsp;
+									<span class="fa fa-clock-o"></span>
+									<span>${data[i].rtime}分钟</span>&nbsp;&nbsp;
+									<span class="fa fa-history"></span>
+									<span>${data[i].rspeed}km/h</span>
+								</p>
+							</div>	
+						</a></li>`;
+
+		}
+		html2+=`</ul>`;
+			},
+			error:function(xhr,type,errorThrown){
+				mui.alert(type);
+				}	      		
+	});
+     var url="http://192.168.43.189:88/zujidata/showsome.php";
+		mui.ajax(url,{
+		type:"get",
+		data:{
+			uname:uname
+		},
+		crossDomain:true,
+		dataType: 'json',
+		success:function(data){
+		for(var i in data){
+			var image=data[i].dimage==""?'../images/cbd.jpg':data[i].dimage;
+			  html3+=`<div class="mui-card" style="">
+			  <div class="" style="width:100%">
+			  <a href="show_zuji.html?did=${data[i].did}">
+				<div class="mui-card-header mui-card-media" style="height:200px;background:no-repeat center url(${image});background-size: cover;width: 100%;" data-sid="${data[i].did}"></div>
+				</a></div>
+				<div class="mui-card-content">
+					<div class="mui-card-content-inner">
+						<p>${data[i].dtime}&nbsp;&nbsp;`;
+						if(data[i].dminutes<60){
+							html3+=`<span class="fa fa-clock-o" style="color:#FF6100"></span>`;
+						}
+						else if(data[i].dminutes>60&&data[i].dminutes<360){
+							html3+=`<span class="fa fa-clock-o" style="color:#00CD00"></span>`;
+						}
+						else{
+							html3+=`<span class="fa fa-clock-o" style="color:#CD0000"></span>`;
+						}
+				html3+=`${data[i].dminutes>0?"停留"+(data[i].dminutes>60?data[i].dminutes/60+"小时"+(data[i].dminutes%60>0?data[i].dminutes%60+"分钟":""):data[i].dminutes+"分钟"):""}</p>
+						<span style="color: #333;" data-allid="${data[i].did}">
+						${state.account} · ${data[i].dplace}</span>
+						<ul class="mui-table-view">				
+					<li class="mui-table-view-cell mui-collapse">
+						<a class="mui-navigate-right" href="#">
+						<p style="color: #333;">${data[i].dtitle}</p>
+						</a>
+						<div class="mui-collapse-content">							
+							<p>
+								<label>同伴:</label>${data[i].dfriend}
+							</p>
+							<p>
+								<label>住宿:</label>${data[i].dhouse}
+							</p>
+							<p>
+								<label>餐饮:</label>${data[i].dfood}
+							</p>
+							<p>
+								<label>游记:</label>${data[i].drecord}
+							</p>
+						</div>
+					</li>
+				</ul>
+					</div>
+				</div>
+				<div class="mui-card-footer">
+					<a class="like"  data-lid="${data[i].did}">
+					<span class="mui-icon-extra mui-icon-extra-like"></span>
+						<span class="mui-badge mui-badge-danger number">${data[i].dlike==null?0:data[i].dlike}</span>
+						</a>
+					<a><span class="mui-icon mui-icon-chatbubble"></span></a>
+				</div>
+			</div>`;
+		}
+			},
+			error:function(xhr,type,errorThrown){
+				mui.alert(type);
+				}	      		
+	});
+if(msg==true){
+	
+	//修改按钮
+	var upd =document.querySelectorAll("#scroll1 .mui-card-footer .update");
+	var upid=null;
+	var updatePage =mui.preload({
+						"id": 'update_view',
+						"url": 'update_view.html'
+				});
+	for(var i=0;i<upd.length;i++){  
+		 upd[i].onclick = (function(a) {
+			return function(){
+				upid=upd[a].dataset.upid;
+				console.log(upid);
+			}
+		})(i)
+		} 
+
+  
+  }	
+
+  var slid=document.getElementById('slider');
+	slid.addEventListener('slide', function(e) {
+					if (e.detail.slideNumber === 1) {
+						var item2_load=item2.querySelector('.mui-loading');
+						if (item2_load) {
+							setTimeout(function() {
+								item2_load.innerHTML = html2;
+								var lia =document.querySelectorAll("#scroll2 .mui-table-view-cell .mui-navigate-right");
+								var rid=null;
+							for(var i=0;i<lia.length;i++){  
+		 						lia[i].onclick = (function(a) {
+									return function(){
+										rid=lia[a].dataset.rid;
+										mui.openWindow({
+											id: 'show_guiji',
+											url:'show_guiji.html?rid='+rid,
+											show: {
+												aniShow: 'pop-in'
+											},
+											waiting: {
+												autoShow: false
+											}
+										});
+									}
+								})(i)
+								} 
+							}, 500);
+						}
+					} 
+					else if (e.detail.slideNumber === 2) {
+						var item3_load=item3.querySelector('.mui-loading');
+						if (item3_load) {
+							setTimeout(function() {
+								item3_load.innerHTML = html3;
+								var like =document.querySelectorAll("#scroll3 .like");
+								var lid=null;
+								//点赞按钮
+								for(var i=0;i<like.length;i++){  
+									 like[i].onclick = (function(a) {  
+										   return function() {  
+											var num=like[a].querySelector(".number").innerHTML; 
+											var dlike;
+											like[a].querySelector(".number").innerHTML=parseInt(num)+1;
+											dlike=like[a].querySelector(".number").innerHTML;
+											lid=like[a].dataset.lid;
+											var url="http://192.168.43.189:88/zujidata/addlike.php";
+									      	mui.ajax(url,{
+									      		type:"post",
+									      		data:{
+									      			did:lid,
+									      			dlike:dlike
+									      		},
+									      		crossDomain:true,
+									      		dataType: 'json',
+									      		success:function(data){
+									      			if(data.code=="1"){
+									      				console.log("like");
+													}
+									      		},
+									      		error:function(xhr,type,errorThrown){
+									      			mui.alert(type);
+									      		}
+									      	});	
+										}  
+									})(i)
+								}  
+						
+							}, 500);
+					}
+				}
+		});
+})();
+
+ function del(did){
+ 
+				    var url="http://192.168.43.189:88/zujidata/delete.php";
+			      	mui.ajax(url,{
+			      		type:"get",
+			      		data:{
+			      			did:did
+			      		},
+			      		crossDomain:true,
+			      		dataType: 'json',
+			      		success:function(data){
+			      			if(data.code=="1"){
+								plus.webview.currentWebview().reload();
+								//关闭modal						
+								mui.alert("删除成功~");
+							}
+							else{
+			      				mui.alert("删除失败~");
+			      			}
+			      		},
+			      		error:function(xhr,type,errorThrown){
+			      			mui.alert(type);
+			      		}
+			      	});	
+	 
+}
+function toZuji(did){
+			  //跳转到show_zuji
+			mui.openWindow({
+				id: 'show_zuji',
+				url:'show_zuji.html?did='+did,
+				show: {
+				aniShow: 'pop-in'
+					},
+				waiting: {
+					autoShow: false
+					}
+			});
+}
+			
+		</script>
+
+	</body>
+
+</html>

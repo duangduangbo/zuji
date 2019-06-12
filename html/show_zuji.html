@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+    <meta name="HandheldFriendly" content="true"/>
+	<meta name="MobileOptimized" content="320"/>
+    <title>足迹</title>
+    <link href="../css/mui.css" rel="stylesheet"/>
+    <link href="../css/style.css" rel="stylesheet"/>
+	<link rel="stylesheet" href="../css/icons-extra.css">
+	<link rel="stylesheet" href="../css/font-awesome.min.css">
+    <script type="text/javascript" src="../js/jquery.js" ></script>
+    <script src="../js/mui.min.js"></script>
+    <script type="text/javascript" src="../js/location.js" ></script>
+    <script type="text/javascript" src="../js/app.js" ></script>
+    
+<style>
+	#map {
+	width: 100%;
+	position: fixed;
+	top: 45px;
+	bottom: 0px;
+	height: 440px;
+	text-align: center;
+	background: #FFFFFF;
+}
+.footer{
+	background-color:#ffffff;
+	height:120px;
+	position: absolute;
+	top:460px;
+}
+.mui-circle{
+	width: 8px;
+    height: 8px;
+    padding: 0;
+    border-radius: 50%;
+        position: relative;
+    display: inline-block;
+    font-size: 12px;
+    text-align: center;
+    top:-2px;
+    margin-right:10px;
+			}
+.mui-media-body{
+	width:100%;
+	padding:0 30px;
+}
+.mui-border-circle{
+	    border-radius: 50%;
+    border: 1px solid #ddd;
+}
+</style>
+    <script type="text/javascript" charset="utf-8">
+	mui.init();
+    var ws=null;
+    var wo=null;
+	var em=null;
+	var map=null;
+	var pcenter=null;
+	var uLocation=false;
+	var uflag=false;
+		var address;
+		var point;
+		var coordTyp;
+function plusReady(){
+	if(!em||ws){return};
+	// 获取窗口对象
+	ws=plus.webview.currentWebview();	
+	wo=ws.opener();
+	map=new plus.maps.Map("map");//创建Map对象
+	setTimeout(function(){
+var url="http://192.168.43.189:88/zujidata/show.php";
+		var state=app.getState();
+		var wurl=ws.getURL();
+		did=wurl.split("=");
+		did=decodeURI(did[1]);
+		console.log(did);
+      	mui.ajax({
+      		type:"POST",
+      		url: url,
+      		dataType: "json",
+      		data:{
+      			did:did
+      		},
+      		success:function(data){
+      			console.log(data[0].dtime);
+      			var s_title=document.getElementById("s_title");
+      			var title=data[0].dtime;
+      			if(title){
+                	title= title.match(/\d{4}.\d{1,2}.\d{1,2}/mg).toString();  
+                	title = title.replace(/[^0-9]/mg, '-'); 
+      			}
+                s_title.innerHTML=title;
+                var dplace=data[0].dplace;
+      			var dtitle=data[0].dtitle;
+      			var did=data[0].did;
+      			var dminutes=data[0].dminutes;
+      			var url="./show_view.html?did="+did;
+      			var foot=document.getElementById("footer");
+      		    var html="";
+      		  	html+=`<a>
+							<div class="views">	<p>&nbsp;</p>
+							</div>
+							<div class="mui-media-body" style="display: inline-block;">
+								<p style="color:#000;margin-bottom: 0px;">
+								<a><span class="mui-icon mui-icon-location"></span></a>
+								${dplace}
+								</p>
+								<p><a><span class="mui-icon-extra mui-icon-extra-people"></span></a>${data[0].uname}</p>
+							</div>	
+						</a>`;
+						foot.innerHTML=html;
+      			plus.maps.Map.geocode(dplace,{},function(event){
+						var point = event.coord;  // 转换后的坐标信息
+			            map.centerAndZoom(point,16);//设置地图初始中心点和缩放级别
+						showMarker(point,map,dtitle,did,dminutes,url,50);
+					},function(e){
+						alert("Failed:"+JSON.stringify(e));
+					});
+      		},
+      		error:function(xhr,type,errorThrown){
+      			mui.alert(status);
+      			console.log(JSON.stringify(xhr));
+      		}
+      	});
+	},300);
+
+	// 显示页面并关闭等待框
+    ws.show("pop-in");
+}
+if(window.plus){
+	plusReady();
+
+	
+}else{
+	document.addEventListener("plusready",plusReady,false);
+}
+// DOMContentloaded事件处理
+document.addEventListener("DOMContentLoaded",function(){
+	em=document.getElementById("map");
+	
+	window.plus&&plusReady();
+},false);
+function del(){
+	var btnArray = ['是', '否'];
+			mui.confirm('删除轨迹，确认？', '足迹', btnArray, function(e) {
+				console.log(e.index);
+			if (e.index == 0) {
+	var url="http://192.168.43.189:88/zujidata/delete_routes.php";
+	var del=document.querySelector(".mui-icon-trash");
+				    var rid=del.dataset.myid;
+				     console.log(rid);
+			      	mui.ajax(url,{
+			      		type:"get",
+			      		data:{
+			      			rid:rid
+			      		},
+			      		crossDomain:true,
+			      		dataType: 'json',
+			      		success:function(data){
+			      			if(data.code=="1"){
+
+								mui.alert("删除成功~");
+							}
+							else{
+			      				mui.alert("删除失败~");
+			      			}
+			      		},
+			      		error:function(xhr,type,errorThrown){
+			      			mui.alert(type);
+			      		}
+			      	});
+			      }
+			});
+}
+
+function onback(){
+	map.hide();
+	ws.close();
+
+
+}
+
+    </script>
+</head>
+
+<body>
+	<header id="header" class="header mui-bar mui-bar-nav">
+		
+		<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left" onclick="onback()"></a>
+		<h1 class="mui-title" id="s_title"></h1>
+		<a class="del" id="del" onclick="del()">
+		
+		</a>
+	</header>
+
+		
+		<div id="map" >地图加载中...</div>
+				
+	<footer id="footer" class="footer mui-bar mui-bar-nav">
+	
+	</footer>
+</body>
+
+</html>

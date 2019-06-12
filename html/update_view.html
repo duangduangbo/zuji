@@ -1,0 +1,371 @@
+<!doctype html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<link href="../css/mui.css" rel="stylesheet" />
+	</head>
+
+	<body>
+		   <script src="https://cdn.wilddog.com/js/client/current/wilddog.js"></script>
+		<script src="../js/mui.js"></script>
+		<script src="../js/jquery.js"></script>
+		<script src="../js/mui.picker.min.js"></script>
+		<script src="../js/app.js"></script>
+		<link rel="stylesheet" type="text/css" href="../css/mui.picker.min.css" />
+		<style type="text/css">
+			.title{
+				background-color: rgba(0,0,0,.25);
+				font-weight: 400;
+			}
+			
+			
+			
+			.mui-popover .mui-popover-arrow{
+				display: none !important;
+			}
+			
+			.operate{
+				text-align: center;
+				margin-top: 3px;
+			}
+			.p-label{
+				font-family: 'Helvetica Neue', Helvetica, sans-serif;
+			    line-height: 1.1;
+			    float: left;
+			    width: 35%;
+			    padding: 11px 15px 0 15px;
+			      font-size: 17px;
+			    color: #000;
+			}
+			#col2{
+				border:1px solid #ddd;
+				border-radius:5px;
+				margin:8px;
+				width:97%;
+			}
+		</style>
+		<script type="text/javascript">
+			mui.init();
+
+		</script>
+						<header class="mui-bar mui-bar-nav">
+		<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+				<h4 id="title" style="text-align: center;" class="mui-title">编辑足迹</h4>
+		</header>
+		<div id="popover" class="mui-content" style="margin:0px auto;">			
+			<div class="mui-content-padded">
+				
+				<form class="mui-input-group" style="">
+					<div class="mui-input-row">
+						<label>标题：</label>
+						<input type="text" class="mui-input-clear" id="col1" placeholder="请输入">
+					</div>
+					<!--<div class="mui-input-row">
+						<label>描述：</label>
+						<input type="text" class="mui-input-clear" id="col2" placeholder="请输入">
+					</div>-->
+					<div class="mui-input-row">
+						<label>开始时间：</label>
+						<input type="text" class="btn mui-input-clear" data-options='{}' id="col3" placeholder="请选择">
+						<!--<button id='demo1' data-options='{}' class="btn mui-btn mui-btn-block">选择日期时间 ...</button>-->
+					</div>
+					<div class="mui-input-row">
+						<label>结束时间：</label>
+						<input type="text" class="btn1 mui-input-clear" data-options='{}' id="col8" placeholder="请选择">
+						<!--<button id='demo1' data-options='{}' class="btn mui-btn mui-btn-block">选择日期时间 ...</button>-->
+					</div>
+					<div class="mui-input-row">
+						<label>餐饮：</label>
+						<input type="text" class="mui-input-clear" id="col4" placeholder="请输入">
+					</div>
+					<div class="mui-input-row">
+						<label>住宿：</label>
+						<input type="text" class="mui-input-clear" id="col5" placeholder="请输入">
+					</div>
+					<div class="mui-input-row">
+						<label>同伴：</label>
+						<input type="text" class="mui-input-clear" id="col7" placeholder="请输入">
+					</div>
+						<p class="p-label">描述：</p>
+							<textarea  rows="5" placeholder="请在此处添加描述" id="col2"></textarea>
+					<input type="hidden" class="mui-input-clear" id="col6" placeholder="请输入">
+						<div class="mui-btn mui-btn-blue" onclick="galleryImg()">从相册中单选图片</div>
+					<span id="suss">未选择</span>
+					<div class="mui-input-row">
+						<span style="position:absolute;top:12px;">允许所有人查看：</span>
+						<input type="hidden" id="isSee" placeholder="请输入">
+						<div class="mui-switch mui-switch-mini mui-active">
+							<div class="mui-switch-handle"></div>
+						</div>
+					</div>
+				</form>
+				<div id="edit_div" class="operate">
+					<button type="button" class="mui-btn mui-btn-blue" id="update" style="margin-right: 30px;">修改</button>
+					<button type="button" class="mui-btn mui-btn-red" id="del">删除</button>
+				</div>
+			</div>
+		</div>
+		
+		<script>
+								
+			function trim(str){ //删除左右两端的空格
+		　　     return str.replace(/(^\s*)|(\s*$)/g, "");
+		　　 }
+		
+			var col1 = document.getElementById("col1");
+			var col2 = document.getElementById("col2");
+			var col3 = document.getElementById("col3");
+			var col4 = document.getElementById("col4");
+			var col5 = document.getElementById("col5");
+			var col6 = document.getElementById("col6");
+			var col7 = document.getElementById("col7");
+			var col8 = document.getElementById("col8");
+			var suss = document.getElementById("suss");
+			var isSee = document.getElementById("isSee");
+			var edit_div = document.getElementById("edit_div");
+			var ws=null;
+			var did=null;
+			var msg=false;
+			var state=app.getState();
+	function galleryImg(){
+			// 从相册中选择图片
+		    plus.gallery.pick(function(path){
+		    	col6.value=path;
+		    	suss.innerHTML="成功";
+		    	console.log(suss.innerHTML);
+		    }, function(e){
+		    	mui.toast('取消选择图片');
+		    }, {filter:'image'});
+		}
+		(function($) {
+				$.init();
+				var btns = $('.btn');
+				var btns1 = $('.btn1');
+				btns.each(function(i, btn) {
+					btn.addEventListener('tap', function() {
+						var _self = this;
+						if(_self.picker) {
+							_self.picker.show(function (rs) {
+								col3.value = rs.text;
+								_self.picker.dispose();
+								_self.picker = null;
+							});
+						} else {
+							var optionsJson = this.getAttribute('data-options') || '{}';
+							var options = JSON.parse(optionsJson);
+							var id = this.getAttribute('id');
+							_self.picker = new $.DtPicker(options);
+							_self.picker.show(function(rs) {
+								col3.value = rs.text;
+								_self.picker.dispose();
+								_self.picker = null;
+							});
+						}
+						
+					}, false);
+				});
+				btns1.each(function(i, btn) {
+					btn.addEventListener('tap', function() {
+						var _self = this;
+						if(_self.picker) {
+							_self.picker.show(function (rs) {
+								col8.value = rs.text;
+								_self.picker.dispose();
+								_self.picker = null;
+							});
+						} else {
+							var optionsJson = this.getAttribute('data-options') || '{}';
+							var options = JSON.parse(optionsJson);
+							var id = this.getAttribute('id');
+							_self.picker = new $.DtPicker(options);
+							_self.picker.show(function(rs) {
+								col8.value = rs.text;
+								_self.picker.dispose();
+								_self.picker = null;
+							});
+						}
+						
+					}, false);
+				});
+//				window.addEventListener('update_view', function(e) {
+//					did=e.detail.did;
+//					
+//				}, false);
+//			console.log(did);
+			})(mui);
+		mui.plusReady(function () {
+					ws=plus.webview.currentWebview();
+					var wurl=ws.getURL();
+					did=wurl.split("=");
+					did=decodeURI(did[1]);
+				console.log(wurl);
+				
+					var url="http://192.168.43.189:88/zujidata/show.php";
+			      	mui.ajax(url,{
+			      		type:"get",
+			      		data:{
+			      			did:did
+			      		},
+			      		crossDomain:true,
+			      		dataType: 'json',
+			      		success:function(data){
+			      			console.log(data[0].isSee);
+							//关闭modal	
+							col1.value=data[0].dtitle;
+							col2.value=data[0].drecord;
+							col3.value=data[0].dtime;
+							col4.value=data[0].dfood;
+							col5.value=data[0].dhouse;
+							col6.value=data[0].dimage;
+							col7.value=data[0].dfriend;
+							col8.value=data[0].detime;
+							isSee.value=data[0].isSee;
+							if(data[0].isSee==0){
+								if($(".mui-input-row .mui-switch").hasClass('mui-active'))
+								{
+									$(".mui-input-row .mui-switch").removeClass("mui-active");
+								}
+							}
+			      		},
+			      		error:function(xhr,type,errorThrown){
+			      			mui.alert(type);
+			      		}
+			      	});	
+			      
+		});
+			document.getElementById("update").addEventListener("tap", function() {
+				var check = true;
+					if(!col1.value||trim(col1.value)==""){
+							var label = col1.previousElementSibling;
+							mui.alert(label.innerText+"不允许为空");
+							check = false;
+					}
+				if(check){
+					console.log(did);
+			var d1;
+			var d2;
+			var minutes;
+			if(col3.value==""&&col8.value!=""){
+			 d1=new Date(col8.value);
+			 d2=new Date(col8.value);
+			 minutes=parseInt(d2-d1)/1000/60;
+			}
+			else if(col8.value==""&&col3.value!=""){
+				d1=new Date(col3.value);
+			 d2=new Date(col3.value);
+			 minutes=parseInt(d2-d1)/1000/60;
+			}
+			else if(col8.value==""&&col3.value==""){
+				minutes=0;
+			}
+			else{
+				d1=new Date(col3.value);
+			 d2=new Date(col8.value);
+			 minutes=parseInt(d2-d1)/1000/60;
+			}
+			if(minutes<0){
+				minutes=-minutes;
+			}
+			console.log(col1.value);
+			console.log(col2.value);
+			console.log(col3.value);
+			console.log(col8.value);
+			console.log(col4.value);
+			console.log(col5.value);
+			console.log(col6.value);
+			console.log(isSee.value);
+		if(state.account==undefined){
+			alert("请登录");
+		}
+				else{		var url="http://192.168.43.189:88/zujidata/update.php";
+			      	mui.ajax(url,{
+			      		type:"post",
+			      		data: {dtitle:col1.value,
+			      			drecord:col2.value,
+			      			dtime:col3.value,
+			      			detime:col8.value,
+			      			dfood:col4.value,
+			      			dhouse:col5.value,
+			      			dimage:col6.value,
+			      			dminutes:minutes,
+			      			dfriend: col7.value,
+			      			isSee: isSee.value,
+			      			did:did
+			      			},
+			      		crossDomain:true,
+			      		dataType: 'json',
+			      		success:function(data){
+			      			console.log(JSON.stringify(data));
+			      			if(data.code=="1"){
+								//关闭modal						
+								mui.alert("修改成功~");
+								plus.webview.currentWebview().reload();
+								plus.webview.close("show-view");
+			      			}
+			      			else{
+			      				mui.alert("修改失败~");
+			      			}
+			      		},
+			      		error:function(xhr,type,errorThrown){
+			      			mui.alert(type);
+			      		}
+			      	});	
+				}
+				}
+			});
+			document.getElementById("del").addEventListener("tap", function() {
+				if(state.account==undefined){
+			alert("请登录");
+		}else{
+				var url="http://192.168.43.189:88/zujidata/delete.php";
+			      	mui.ajax(url,{
+			      		type:"get",
+			      		data:{
+			      			did:did
+			      		},
+			      		crossDomain:true,
+			      		dataType: 'json',
+			      		success:function(data){
+			      			if(data.code=="1"){
+			      				
+//								plus.webview.currentWebview().reload();
+								//关闭modal						
+								
+									mui.toast("删除成功~");
+								setTimeout(function(){
+									mui.openWindow({
+									url:'../index.html',
+									id:'index.html'
+								});
+								},0)
+								
+							}
+							else{
+			      				mui.alert("删除失败~");
+			      			}
+			      		},
+			      		error:function(xhr,type,errorThrown){
+			      			mui.alert(type);
+			      		}
+			      	});	
+			}
+			});
+	mui('.mui-popover .mui-switch').each(function() { //循环所有toggle
+				//toggle.classList.contains('mui-active') 可识别该toggle的开关状态
+				this.parentNode.querySelector('input').value = this.classList.contains('mui-active') ? 'true' : 'false';
+				/**
+				 * toggle 事件监听
+				 */
+				this.addEventListener('toggle', function(event) {
+					//event.detail.isActive 可直接获取当前状态
+					this.parentNode.querySelector('input').value = event.detail.isActive ? 'true' : 'false';
+				});
+			});
+			
+		</script>
+	</body>
+
+</html>

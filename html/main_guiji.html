@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+    <meta name="HandheldFriendly" content="true"/>
+	<meta name="MobileOptimized" content="320"/>
+    <title>足迹</title>
+    <script src="../js/mui.min.js"></script>
+    <link href="../css/mui.css" rel="stylesheet"/>
+    <link href="../css/style.css" rel="stylesheet"/>
+    <script type="text/javascript" src="../js/jquery.js" ></script>
+    <script type="text/javascript" src="../js/location.js" ></script>
+    <script type="text/javascript" src="../js/app.js" ></script>
+    
+<style>
+	#map {
+	width: 100%;
+	position: fixed;
+	top: 250px;
+	bottom: 0px;
+	line-height: 200px;
+	text-align: center;
+	background: #FFFFFF;
+}
+.header{
+	background-color:#ffffff;
+	height:300px;
+}
+</style>
+    <script type="text/javascript" charset="utf-8">
+	mui.init();
+    var ws=null;
+    var wo=null;
+	var em=null;
+	var map=null;
+	var pcenter=null;
+	var uLocation=false;
+	var uflag=false;
+		var address;
+		var point;
+		var coordTyp;
+function plusReady(){
+	if(!em||ws){return};
+	ws=plus.webview.currentWebview();// 获取窗口对象
+	wo=ws.opener();
+	map=new plus.maps.Map("map");//创建Map对象
+	getGeocode();//获取定位信息
+	setTimeout(function(){
+		map.showZoomControls( true );
+		uLocation=map.getUserLocation(function(state,pos){
+		if(0==state){
+			map.setCenter(pos);//设置地图的中心点
+			map.centerAndZoom(pos,18);//设置地图初始中心点和缩放级别
+			pcenter=pos;
+			uflag=true;
+		}
+		if(uLocation)
+		{
+			polyMarker(pos,map);
+		}
+    },false); 
+		var wplay=plus.webview.create('start.html','start',{top:'500px',height:'55px',width:'53px',right:'150px',position:'absolute',scrollIndicator:'none',background:"transparent"});
+		wplay.addEventListener("loaded",function(){
+			wplay.show('fade-in',300);
+			wplay=null;
+	    },false);
+	    
+	},300);
+	// 显示页面并关闭等待框
+    ws.show("pop-in");
+}
+if(window.plus){
+	plusReady();
+
+	
+}else{
+	document.addEventListener("plusready",plusReady,false);
+}
+// DOMContentloaded事件处理
+document.addEventListener("DOMContentLoaded",function(){
+	em=document.getElementById("map");
+	window.plus&&plusReady();
+},false);
+
+ function reload(){
+ 	ws.reload();
+ }
+ var stime;
+var startT;
+var tm;
+ function start(){
+ 	var calt=document.getElementById("calt");
+ 	var tspeed=document.getElementById("tspeed");
+ 	var avgs=document.getElementById("avgs");
+	var dtime=document.getElementById("dtime");
+	calt.innerHTML=0;
+	avgs.innerHTML=0;
+	tspeed.innerHTML=0;
+	dtime.innerHTML="00:00:00";
+ 	startT=new Date();
+ 	var dt=startT.toLocaleDateString();
+ 	var hr=startT.getHours();
+ 	var mi=startT.getMinutes();
+ 	console.log(JSON.stringify(map));
+ 	polyMarker(pos,map);
+	map.clearOverlays();
+ 	console.log(JSON.stringify(map));
+ 	startT=dt+" "+hr+":"+mi;
+ 	uLocation=map.getUserLocation(function(state,pos){
+		if(0==state){
+			map.setCenter(pos);//设置地图的中心点
+			map.centerAndZoom(pos,18);//设置地图初始中心点和缩放级别
+		
+		}
+		if(uLocation)
+		{
+			polyMarker(pos,map);
+		}
+    },false); 
+    startTime();
+	watchPos(map,calt,tspeed);
+ 	
+ }
+ function end(){
+ 	var calt=document.getElementById("calt");
+ 	var avgs=document.getElementById("avgs");
+	var dtime=document.getElementById("dtime");
+	var st=startT;
+	var endt=new Date();
+	var arr=[];
+	var state=app.getState();
+	var uname=state.account;
+	var endD=endt.toLocaleDateString();
+	var endH=endt.getHours();
+	var endM=endt.getMinutes();
+	endt=endD+" "+endH+":"+endM;
+	dtime=dtime.innerHTML;
+	dtime=dtime.split(":");
+	dtime=parseInt(dtime[0])+parseInt(dtime[1]);
+	arr["st"]=st;
+	arr["endt"]=endt;
+	arr["calt"]=calt.innerHTML;
+	arr["avgs"]=avgs.innerHTML;
+	arr["dtime"]=dtime;
+	arr["uname"]=uname;
+	clearInterval(tm);
+	clearWatch(map,arr);
+	uLocation=map.getUserLocation(function(state,pos){
+		if(0==state){
+			map.setCenter(pos);//设置地图的中心点
+			map.centerAndZoom(pos,18);//设置地图初始中心点和缩放级别
+		}
+		if(uLocation)
+		{
+			polyMarker(pos,map);
+		}
+    },false);
+	console.log(tm);
+	console.log(JSON.stringify(pcenter));
+ }
+
+function startTime()
+{
+var h=0;
+var m=0;
+var s=0;
+var avgs=document.getElementById("avgs");
+var dtime=document.getElementById("dtime");
+var calt=document.getElementById("calt");
+console.log(calt.innerHTML);
+tm=setInterval(function(){
+	s++;
+	if(s==60){
+		m++;
+		s=0;
+	}
+	if(m==60){
+		h++;
+		m=0;
+	}
+if(m>0||h>0||s>0){
+	m=parseInt(m);
+	h=parseInt(h);
+	s=parseInt(s);
+	console.log(calt.innerHTML);
+	var calt1=Number(calt.innerHTML);
+avgs.innerHTML=Math.round(calt1/Number(h+(m/60)+(s/360)));
+
+}
+m=checkTime(m);
+s=checkTime(s);
+h=checkTime(h);
+dtime.innerHTML=h+":"+m+":"+s;
+},1000);
+}
+
+function checkTime(i)
+{
+	var i=parseInt(i);
+if (i<10&&i>=0) 
+  {i="0" + i}
+  return i
+}
+    </script>
+</head>
+
+<body>
+	<header id="header" class="header mui-bar mui-bar-nav">
+		
+		<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+		<h1 class="mui-title">轨迹记录</h1>
+		
+		<div style="clear:both;display:inline-block;height:100px;width:100%;text-align: center;">	
+			<p style="padding:30px;"><a style="font-size:45px;" id="tspeed">0</a>km/h</p>
+			<p>时速</p>
+	</div>
+			<hr style="color:#ddd;">
+		<div style="clear:both;">
+			<div style="display:inline-block;height:50px;width:30%;text-align: center;">
+			<p ><a href="javascript:;" id="calt">0</a>km</p>
+			<p>距离</p>
+			</div>
+			<div style="display:inline-block;height:50px;width:30%;text-align: center;">
+			<p id="dtime">00:00:00</p>
+			<p>时间</p>
+			</div>
+			<div style="display:inline-block;height:50px;width:30%;text-align: center;">
+			<p><a href="javascript:;" id="avgs">0</a>km/h</p>
+			<p>均速</p>
+			</div>
+		</div>	
+	</header>
+
+		
+		<div id="map" >地图加载中...</div>
+				
+
+		<script type="text/javascript">
+
+		</script>
+</body>
+
+</html>

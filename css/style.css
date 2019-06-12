@@ -1,0 +1,20 @@
+.ui-page-login,
+body {
+	width: 100%;
+	height: 100%;
+	margin: 0px;
+	padding: 0px;
+}
+.mui-content{height: 100%;}
+.display-inline{
+	display:inline-block;
+}
+.mui-input-row{
+	overflow: inherit;
+}
+.font-30{
+	font-size:30px;
+}
+.mui-search input[type=search]{	
+	background-color:white;
+}

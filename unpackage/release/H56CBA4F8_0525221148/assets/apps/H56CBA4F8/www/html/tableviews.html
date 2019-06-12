@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Hello MUI</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+		<!--标准mui.css-->
+		<link rel="stylesheet" href="../css/mui.min.css">
+		<!--App自定义的css-->
+		<link rel="stylesheet" type="text/css" href="../css/app.css"/>
+		<style>
+			.title{
+				margin: 20px 15px 7px;
+				color: #6d6d72;
+				font-size: 15px;
+			}
+			body{
+				background:#ffffff;
+			}
+			.mui-content{
+				background:#ffffff;
+			}
+			.new-card{
+				font-size: 14px;
+			    position: relative;
+			    overflow: hidden;
+			    margin: 10px;
+			    border-radius: 2px;
+			    background-color: #fff;
+			    background-clip: padding-box;
+			}
+			.mui-icon{
+				font-size:18px;
+			}
+			.mui-table-view-cell>a:not(.mui-btn){
+				margin:-18px -15px !important;
+			}
+			.views{
+				width:30px;display: inline-block;
+			}
+			.mui-table-view-cell>a:not(.mui-btn){
+				padding:18px 15px 11px 15px; !important;
+			}
+			.result-no{
+				    width: 300px;
+				    height: 600px;
+				    text-align: center;
+				    line-height: 300px;
+				    font-size: 16px;
+				    color: #6C6C6C;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="mui-content">
+			<div class="new-card" style="margin-bottom: 35px;">
+				<ul class="mui-table-view" id="li-views">
+					<!--<li class="mui-table-view-cell" >
+						<a class="mui-navigate-right" >
+							<div class="views">
+								<span class="mui-icon mui-icon-location"></span>
+								<p>&nbsp;</p>
+							</div>
+							<div class="mui-media-body" style="display: inline-block;">
+								<p style="color:#000;">'+pos.name+'</p>
+								<p class="mui-ellipsis" style="color:#B5B5B5;font-size:12px;overflow: hidden; text-overflow: ellipsis; white-space: nowrap;width: 20em;">'+
+									pos.address+
+								</p></div>	</a></li>-->
+				</ul>
+			</div>
+		</div>
+	</body>
+	<script src="../js/mui.min.js"></script>
+	<script src="../js/app.js"></script>
+	<script>
+		var msg=false;
+		(function(){
+			mui.init({
+				swipeBack:false //启用右滑关闭功能
+			});
+			var views=document.getElementById("li-views");
+			console.log(views.querySelectorAll("li a p.mui-ellipsis"));
+				window.addEventListener('tableviews', function(e) {
+					var pos=e.detail.result.poiList;
+					var result=e.detail.result;
+					var html="";
+					if(e.detail.state!=0){
+						html+='<div class="result-no"><span class="mui-icon mui-icon-info"></span>没有检索到结果</div>';
+					}
+					else{
+					for(let i=0; i<result.currentNumber; i++){
+						var pos = result.poiList[i];
+						html+='<li class="mui-table-view-cell" >'+
+						'<a class="mui-navigate-right" >'+
+							
+							'<div class="views mui-slider-handle">'+
+								'<span class="mui-icon mui-icon-location"></span>'+
+								'<p>&nbsp;</p>'+
+							'</div>'+
+							'<div class="mui-media-body" style="display: inline-block;">'+
+								'<p style="color:#000;">'+pos.name+'</p>'+
+								'<p class="mui-ellipsis" style="color:#B5B5B5;font-size:12px;overflow: hidden; text-overflow: ellipsis; white-space: nowrap;width: 20em;">'+
+									pos.address+
+								'</p></div>	'+
+								'</a></li>';
+		
+						}
+					msg=true;												
+				}	
+					views.innerHTML=html;
+					if(msg){
+					var new_add=document.querySelectorAll("#li-views li a");
+					var addPage =mui.preload({
+						"id": 'new_add.html',
+						"url": 'new_add.html'
+					});
+					console.log(addPage);
+					for(let i=0;i<new_add.length;i++){  
+						console.log(JSON.stringify(new_add[i]));
+						var add=new_add[i];
+						add.onclick = (function(a) {  
+						  return function() {   
+						  	var elem=this.querySelector("p.mui-ellipsis");
+						  	var dplace=elem.innerText; 
+							mui.fire(addPage , 'new_add', {dplace:dplace});
+						setTimeout(function() {
+							mui.openWindow({
+								id: 'new_add.html',
+								url:'new_add.html',
+								show: {
+									aniShow: 'pop-in'
+								},
+								waiting: {
+									autoShow: false
+								}
+							});
+						}, 0);							  
+						}  
+						})(i)
+						}  	
+					}
+				}, false);
+				console.log(msg);
+
+			
+		})();
+		
+	</script>
+</html>

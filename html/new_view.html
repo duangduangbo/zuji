@@ -1,0 +1,299 @@
+<!doctype html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<link href="../css/mui.css" rel="stylesheet" />
+	</head>
+
+	<body>
+		   <script src="https://cdn.wilddog.com/js/client/current/wilddog.js"></script>
+		<script src="../js/mui.js"></script>
+		<script src="../js/jquery.js"></script>
+		<script src="../js/mui.picker.min.js"></script>
+		<link rel="stylesheet" type="text/css" href="../css/mui.picker.min.css" />
+		<script src="../js/app.js"></script>
+		<script src="../js/exif-js-master/exif.js"></script>
+		<style type="text/css">
+			.title{
+				background-color: rgba(0,0,0,.25);
+				font-weight: 400;
+			}
+			
+			#popover{
+				min-width: 282px;
+			}
+			
+			.mui-popover .mui-popover-arrow{
+				display: none !important;
+			}
+			
+			.operate{
+				text-align: center;
+				margin-top: 3px;
+			}
+		</style>
+		<script type="text/javascript">
+			mui.init();
+
+		</script>
+			
+		<div id="popover" class="mui-popover" style="margin:0px auto;">			
+			<div class="mui-content-padded">
+				<h4 id="title" style="text-align: center;">添加足迹</h4>
+				<form class="mui-input-group" style="">
+					<div class="mui-input-row">
+						<label>标题：</label>
+						<input type="text" class="mui-input-clear" id="z_title" placeholder="请输入">
+					</div>
+					<div class="mui-input-row">
+						<label>描述：</label>
+						<input type="text" class="mui-input-clear" id="z_decript" placeholder="请输入">
+					</div>
+					<div class="mui-input-row">
+						<label>开始时间：</label>
+						<input type="text" class="btn mui-input-clear" data-options='{}' id="z_stime" placeholder="请选择">
+						<!--<button id='demo1' data-options='{}' class="btn mui-btn mui-btn-block">选择日期时间 ...</button>-->
+					</div>
+					<div class="mui-input-row">
+						<label>结束时间：</label>
+						<input type="text" class="btn1 mui-input-clear" data-options='{}' id="z_etime" placeholder="请选择">
+						<!--<button id='demo1' data-options='{}' class="btn mui-btn mui-btn-block">选择日期时间 ...</button>-->
+					</div>
+					<div class="mui-input-row">
+						<label>餐饮：</label>
+						<input type="text" class="mui-input-clear" id="z_food" placeholder="请输入">
+					</div>
+					<div class="mui-input-row">
+						<label>住宿：</label>
+						<input type="text" class="mui-input-clear" id="z_house" placeholder="请输入">
+					</div>
+					<div class="mui-input-row">
+						<label>同伴：</label>
+						<input type="text" class="mui-input-clear" id="z_friend" placeholder="请输入">
+					</div>
+						<input type="hidden" class="mui-input-clear" id="col6" placeholder="请输入">
+						<div class="mui-btn mui-btn-blue" onclick="galleryImg()">从相册中单选图片</div>
+						<img src="" id="z_img" style="display:none;"/>
+						<span id="suss">未选择</span>
+					<div class="mui-input-row">
+						<span style="position:absolute;top:12px;">允许所有人查看：</span>
+						<input type="hidden" id="isSee" placeholder="请输入">
+						<div class="mui-switch mui-switch-mini mui-active ">
+							<div class="mui-switch-handle"></div>
+						</div>
+					</div>
+				</form>
+				<div id="add_div" class="operate">
+					<button type="button" class="mui-btn mui-btn-blue" id="add"style="margin-right: 30px;">确定</button>
+					<button type="button" class="mui-btn mui-btn-red" id="close">取消</button>
+				</div>
+			</div>
+		</div>
+		<script>
+			var z_title = document.getElementById("z_title");
+			var z_decript = document.getElementById("z_decript");
+			var z_stime = document.getElementById("z_stime");
+			var z_food = document.getElementById("z_food");
+			var z_house = document.getElementById("z_house");
+			var col6 = document.getElementById("col6");
+			var z_friend = document.getElementById("z_friend");
+			var z_etime = document.getElementById("z_etime");//结束时间
+			var add_div = document.getElementById("add_div");
+			var edit_div = document.getElementById("edit_div");
+			var suss = document.getElementById("suss");
+			var isSee = document.getElementById("isSee");
+			var title = document.getElementById("title");
+			var z_img = document.getElementById("z_img");
+			var state=app.getState();
+			var uname=state.account;
+		function galleryImg(){
+			// 从相册中选择图片
+		    plus.gallery.pick(function(path){
+		    	col6.value=path;
+		    	suss.innerHTML="成功";
+		    	console.log(suss.innerHTML);
+		    	z_img.src=path;
+		    	var img=new Image();
+		    	img.src=path;
+		    	console.log(JSON.stringify(z_img.src));
+		    	EXIF.getData(img,function(){
+				var	exif=JSON.stringify(EXIF.getAllTags(this));
+  				console.log(exif);
+		    	});
+		    	console.log(EXIF.pretty(img));
+		    }, function(e){
+		    	mui.toast('取消选择图片');
+		    }, {filter:'image'});
+		}
+		(function($) {
+				$.init();
+				var btns = $('.btn');
+				var btns1 = $('.btn1');
+				btns.each(function(i, btn) {
+					btn.addEventListener('tap', function() {
+						var _self = this;
+						if(_self.picker) {
+							_self.picker.show(function (rs) {
+								z_stime.value = rs.text;
+								_self.picker.dispose();
+								_self.picker = null;
+							});
+						} else {
+							var optionsJson = this.getAttribute('data-options') || '{}';
+							var options = JSON.parse(optionsJson);
+							var id = this.getAttribute('id');
+							_self.picker = new $.DtPicker(options);
+							_self.picker.show(function(rs) {
+								z_stime.value = rs.text;
+								_self.picker.dispose();
+								_self.picker = null;
+							});
+						}
+						
+					}, false);
+				});
+				btns1.each(function(i, btn) {
+					btn.addEventListener('tap', function() {
+						var _self = this;
+						if(_self.picker) {
+							_self.picker.show(function (rs) {//显示picker
+								z_etime.value = rs.text;
+								_self.picker.dispose();//所以每次用完便立即调用 dispose() 进行释放,下次用时再创建新实例
+								_self.picker = null;
+							});
+						} else {
+							var optionsJson = this.getAttribute('data-options') || '{}';
+							var options = JSON.parse(optionsJson);
+							var id = this.getAttribute('id');
+							_self.picker = new $.DtPicker(options);
+							_self.picker.show(function(rs) {
+								z_etime.value = rs.text;
+								_self.picker.dispose();
+								_self.picker = null;
+							});
+						}
+						
+					}, false);
+				});
+			})(mui);						
+			function trim(str){ //删除左右两端的空格
+		　　     return str.replace(/(^\s*)|(\s*$)/g, "");
+		　　 }
+			var ws=null;
+			var dplace=null;
+		mui.plusReady(function () {
+					ws=plus.webview.currentWebview();
+					var wurl=ws.getURL();
+					dplace=wurl.split("=");
+					dplace=decodeURI(dplace[1]);
+					
+				
+		});
+			
+			document.getElementById("add").addEventListener('tap', function() {
+				
+					var check = true;
+				
+						if(!z_title.value||trim(z_title.value)==""){
+							var label = z_title.previousElementSibling;
+							mui.alert(label.innerText+"不允许为空");
+							check = false;
+						}
+				
+					if(check){
+						
+			console.log(z_stime.value);
+			console.log(z_etime.value);
+			var d1;
+			var d2;
+			var minutes;
+			if(z_stime.value==""&&z_etime.value!=""){
+			 d1=new Date(z_etime.value);
+			 d2=new Date(z_etime.value);
+			 minutes=parseInt(d2-d1)/1000/60;
+			}
+			else if(z_etime.value==""&&z_stime.value!=""){
+				d1=new Date(z_stime.value);
+			 d2=new Date(z_stime.value);
+			 minutes=parseInt(d2-d1)/1000/60;
+			}
+			else if(z_etime.value==""&&z_stime.value==""){
+				minutes=0;
+			}
+			else{
+				d1=new Date(z_stime.value);
+			 d2=new Date(z_etime.value);
+			 minutes=parseInt(d2-d1)/1000/60;
+			}
+			if(minutes<0){
+				minutes=-minutes;
+			}
+			
+			console.log(d1);
+			console.log(d2);
+			if(state.account==undefined){
+				alert("请登录");
+				}else{
+					var url="http://192.168.43.189:88/zujidata/add.php";
+			      	mui.ajax(url,{
+			      		type:"post",
+			      		data: {dtitle:z_title.value,
+			      			drecord:z_decript.value,
+			      			dtime:z_stime.value,
+			      			detime:z_etime.value,
+			      			dminutes: minutes,
+			      			dfood:z_food.value,
+			      			dhouse:z_house.value,
+			      			dimage: col6.value,
+			      			dfriend: z_friend.value,
+			      			isSee: isSee.value,
+			      			dplace:dplace,
+			      		     uname:uname},
+			      		crossDomain:true,
+			      		dataType: 'json',
+			      		success:function(data){
+			      			console.log(data.code);
+			      			if(data.code=="1"){
+								//关闭modal						
+								mui.alert("添加成功~");
+								
+								plus.webview.currentWebview().reload();
+								plus.webview.close("view");
+			      			}	
+			      			else{
+			      				mui.alert("添加失败~");
+			      			}
+			      		},
+			      		error:function(xhr,type,errorThrown){
+			      			mui.alert(type);
+			      			console.log(type);
+			      		}
+			      	});						
+					}
+			}
+			});
+			document.getElementById("close").addEventListener("tap", function() {
+				
+				//关闭modal		
+				plus.webview.close("view");
+	
+			});
+			mui('.mui-popover .mui-switch').each(function() { //循环所有toggle
+				//toggle.classList.contains('mui-active') 可识别该toggle的开关状态
+				this.parentNode.querySelector('input').value = this.classList.contains('mui-active') ? 1 : 0;
+				/**
+				 * toggle 事件监听
+				 */
+				this.addEventListener('toggle', function(event) {
+					//event.detail.isActive 可直接获取当前状态
+					this.parentNode.querySelector('input').value = event.detail.isActive ? 1 : 0;
+				});
+			});
+			
+		</script>
+	</body>
+
+</html>

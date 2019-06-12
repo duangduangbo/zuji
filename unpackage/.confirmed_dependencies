@@ -3,9 +3,120 @@
     "href": "index.html",
     "resources": [
       "js/mui.min.js",
-      "css/mui.min.css"
+      "css/mui.min.css",
+      "html/maps_map_sub.html",
+      "html/new_view.html",
+      "html/add_sub.html"
     ],
-    "refer": [],
+    "refer": [
+      "html/addzu.html",
+      "html/maps_map_sub.html",
+      "html/new_view.html",
+      "html/show_view.html",
+      "html/add_sub.html",
+      "html/setting.html",
+      "html/tableviews.html",
+      "html/addgui.html",
+      "html/detail.html"
+    ],
     "priority": 0
+  },
+  "html/addzu.html": {
+    "refer": [
+      "index.html",
+      "html/addgui.html",
+      "html/show_view.html",
+      "html/update_view.html",
+      "html/show_guiji.html",
+      "html/show_zuji.html"
+    ],
+    "resources": [
+      "index.html",
+      "images/cbd.jpg",
+      "js/mui.js"
+    ]
+  },
+  "html/addgui.html": {
+    "refer": [
+      "html/addzu.html",
+      "html/guiji.html",
+      "html/main_guiji.html"
+    ],
+    "resources": []
+  },
+  "html/add_sub.html": {
+    "refer": [
+      "html/addzu.html"
+    ],
+    "resources": [
+      "css/common.css",
+      "css/mui.css",
+      "js/mui.js"
+    ]
+  },
+  "html/setting.html": {
+    "refer": [
+      "html/reg.html",
+      "html/login.html"
+    ],
+    "resources": []
+  },
+  "html/reg.html": {
+    "refer": [
+      "html/login.html",
+      "html/reg.html"
+    ],
+    "resources": []
+  },
+  "html/login.html": {
+    "refer": [
+      "html/main.html",
+      "html/setting.html",
+      "html/reg.html",
+      "html/forget_password.html"
+    ],
+    "resources": []
+  },
+  "html/tableviews.html": {
+    "refer": [
+      "html/new_add.html"
+    ],
+    "resources": []
+  },
+  "html/new_add.html": {
+    "refer": [
+      "html/tableviews.html",
+      "index.html"
+    ],
+    "resources": []
+  },
+  "html/update_view.html": {
+    "refer": [
+      "html/addzu.html",
+      "index.html"
+    ]
+  },
+  "html/main_guiji.html": {
+    "refer": [
+      "html/start.html",
+      "html/add_sub.html"
+    ]
+  },
+  "html/detail.html": {
+    "resources": [
+      "/js/mui.min.js"
+    ]
+  },
+  "html/show_guiji.html": {
+    "refer": [
+      "html/start.html",
+      "html/addzu.html"
+    ]
+  },
+  "html/show_zuji.html": {
+    "refer": [
+      "html/addzu.html",
+      "html/show_view.html"
+    ]
   }
 }

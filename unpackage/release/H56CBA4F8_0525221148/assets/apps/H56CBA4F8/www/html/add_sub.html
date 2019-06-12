@@ -1,0 +1,62 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<meta charset="utf-8"/>
+		<meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+		<meta name="HandheldFriendly" content="true"/>
+		<meta name="MobileOptimized" content="320"/>
+		<title>Hello H5+</title>
+		<link href="../css/mui.css" rel="stylesheet" />
+		<link rel="stylesheet" href="../css/common.css" type="text/css" charset="utf-8"/>
+		
+		<style type="text/css">
+			
+html,body{
+	overflow:hidden;
+	background:rgba(255,255,255,0);
+}
+.div-width{
+	width:40px;
+	height:40px;
+	background-color:#007aff;
+	border-radius:50%;
+	color:#fff;
+	display:block;
+	font-size: 40px;
+	text-align:center;
+    position:absolute;
+    right:1px;
+}
+
+.add-a{
+	color:#fff;
+	background-color:transparent;
+	font-size: 40px;
+	
+}
+.mui-icon{
+	font-size: 40px;
+}
+		</style>
+	</head>
+	<body>
+		<script src="../js/mui.min.js"></script>
+		<script src="../js/app.js"></script>
+		<script type="text/javascript">
+			mui.init();
+			function jumpToAddzuView(){
+				mui.openWindow({
+					url:'addzu.html',
+					id:'addzu.html'
+				});
+			}
+			
+		</script>
+		<div id="" class="div-width">
+    	<a href="#"  class="add-a" onclick="jumpToAddzuView()">
+    		<span class="mui-icon mui-icon-plusempty font-30" ></span>
+    	</a>
+		</div>
+		
+	</body>
+</html>

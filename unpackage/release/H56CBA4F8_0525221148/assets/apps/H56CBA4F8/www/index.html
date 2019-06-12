@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+    <meta name="HandheldFriendly" content="true"/>
+	<meta name="MobileOptimized" content="320"/>
+    <title>足迹</title>
+    <script src="js/mui.min.js"></script>
+    <link href="css/mui.css" rel="stylesheet"/>
+    <link href="css/style.css" rel="stylesheet"/>
+    <script src="https://cdn.wilddog.com/js/client/current/wilddog.js"></script>
+    <script type="text/javascript" src="js/jquery.js" ></script>
+    <script type="text/javascript" src="js/location.js" ></script>
+    <script type="text/javascript" src="js/app.js" ></script>
+    
+<style>
+	#map {
+	width: 100%;
+	position: fixed;
+	top: 45px;
+	bottom: 0px;
+	line-height: 200px;
+	text-align: center;
+	background: #FFFFFF;
+}
+
+</style>
+ <script type="text/javascript" charset="utf-8">
+	mui.init();
+    var ws=null;
+    var wo=null;
+	var em=null;
+	var map=null;
+	var pcenter=null;
+	var uLocation=false;
+	var uflag=false;
+	var address;
+	var point;
+	var coordTyp;
+function plusReady(){
+	if(!em||ws){
+		return 
+	};
+	ws=plus.webview.currentWebview();	// 获取窗口对象
+	wo=ws.opener();
+	map=new plus.maps.Map("map");//创建Map对象
+	getGeocode();//获取定位信息
+	setTimeout(function(){		
+		map.showUserLocation( true );
+		map.showZoomControls( true );
+		uLocation=map.getUserLocation(function(state,pos){
+		if(0==state){
+			map.setCenter(pos);//设置地图的中心点
+			map.centerAndZoom(pos,13);//设置地图初始中心点和缩放级别
+			pcenter=pos;
+			uflag=true;
+			
+		}
+		if(uLocation)
+		{
+			createMarker(pos,map);
+		}
+		//在主页添加链接显示足迹等
+		var wsub=plus.webview.create('html/add_sub.html','add-sub',{top:'400px',height:'40px',width:'42px',right:'8px',position:'absolute',scrollIndicator:'none',background:"transparent"});
+		wsub.addEventListener("loaded",function(){
+			wsub.show('fade-in',300);
+			wsub=null;
+	    },false);
+	    //在主页添加轨迹
+	    var wgui=plus.webview.create('html/addgui.html','add_gui',{top:'350px',height:'40px',width:'42px',right:'8px',position:'absolute',scrollIndicator:'none',background:"transparent"});
+		wgui.addEventListener("loaded",function(){
+			wgui.show('fade-in',300);
+			wgui=null;
+	    },false);
+	//搜索
+	document.getElementById("ser").addEventListener("keydown",function(e){ 
+        if(13 == e.keyCode){ //点击了“搜索”  
+           document.activeElement.blur();//隐藏软键盘 
+           	// 将检索到的第一条信息作为标点添加到地图中
+	var searchObj = new plus.maps.Search( map );
+	searchObj.onPoiSearchComplete = function( state, result ){
+			var floatw=plus.webview.create('html/tableviews.html','tableviews',{top:'55px',height:'510px',width:'340px',left:'10px',position:'absolute',background:"transparent",scrollIndicator:'none'});
+		    floatw.addEventListener("loaded",function(){
+			floatw.show('fade-in',300);
+			floatw=null;
+		    },false);
+		    mui.fire(floatw,"tableviews",{result:result,state:state});
+	}
+	searchObj.poiSearchNearBy( this.value, pcenter, 1000 );
+        } 
+    },false); 
+
+		var url="http://192.168.43.189:88/zujidata/index.php";
+		var state=app.getState();
+		console.log(state.account);
+		
+      	mui.ajax({
+      		type:"POST",
+      		url: url,
+      		dataType: "json",
+      		data:{
+      			uname:state.account
+      		},
+      		crossDomain:true,
+      		success:function(data){
+      			for(let i in data){
+      				let dplace=data[i].dplace;
+      				let dtitle=data[i].dtitle;
+      				let did=data[i].did;
+      				let dminutes=data[i].dminutes;
+      				plus.maps.Map.geocode(dplace,{},function(event){
+						var address = event.address;  // 转换后的地理位置
+						var point = event.coord;  // 转换后的坐标信息
+						var coordType = event.coordType;	// 转换后的坐标系类型
+						showMarker(point,map,dtitle,did,dminutes);
+					},function(e){
+						alert("Failed:"+JSON.stringify(e));
+					});
+      			}
+      		},
+      		error:function(xhr,type,errorThrown){
+      			mui.alert("无网络");
+      			console.log(errorThrown);
+      		}
+      	});
+	});
+	},300);
+	map.onclick=function(point){
+		//将坐标转换为地址
+	plus.maps.Map.reverseGeocode(point,{},function(event){
+		 address = event.address;  // 转换后的地理位置
+		 point = event.coord;  // 转换后的坐标信息
+		 coordType = event.coordType;	// 转换后的坐标系类型
+		var floatw=plus.webview.create('html/new_view.html?dplace='+address,'view',{top:'60px',height:'430px',width:'282px',left:'40px',position:'absolute',background:"rgba(0,0,0,0.8)",scrollIndicator:'none',scalable:false,popGesture:'none'});
+	    floatw.addEventListener("loaded",function(){
+		floatw.show('fade-in',300);
+		floatw=null;
+	    },false);
+	},function(e){
+		alert("Failed:"+JSON.stringify(e));
+	});
+	}
+		var backButtonPress = 0;
+		mui.back = function(event) {
+			backButtonPress++;
+				if (backButtonPress > 1) {
+					plus.runtime.quit();
+					} 
+				else {
+					plus.nativeUI.toast('再按一次退出应用');
+					}
+				setTimeout(function() {
+					backButtonPress = 0;
+					}, 1000);
+				return false;
+			};
+	// 显示页面并关闭等待框
+    ws.show("pop-in");
+}
+if(window.plus){
+	plusReady();
+}else{
+	document.addEventListener("plusready",plusReady,false);
+}
+// DOMContentloaded事件处理
+document.addEventListener("DOMContentLoaded",function(){
+	em=document.getElementById("map");
+	window.plus&&plusReady();
+},false);
+
+function jumpToAddzuView(){
+	mui.openWindow({
+		url:'html/addzu.html',
+		id:'addzu.html',
+		show: {
+			aniShow: 'pop-in'
+			},
+		waiting: {
+			autoShow: false
+		}
+	});
+}
+  //顶部右上角按钮menu触发弹出菜单
+   function openView(){
+   	var topoffset='44px';
+	if(plus.navigator.isImmersedStatusbar()){// 兼容immersed状态栏模式
+		topoffset=(Math.round(plus.navigator.getStatusbarHeight())+44)+'px';
+	}
+		var wsub=plus.webview.create('html/maps_map_sub.html','sub',{top:topoffset,height:'60px',position:'absolute',scrollIndicator:'none',background:'transparent'});
+	ws.append(wsub);
+   }
+   function jumpToSetting(){
+	mui.openWindow({
+		url:'html/setting.html',
+		id:'setting.html',
+	show: {
+		aniShow: 'pop-in'
+	},
+	waiting: {
+		autoShow: false
+	}
+	});
+}
+	
+ function reload(){
+ 	ws.reload();
+ }
+    </script>
+</head>
+
+<body>
+	<header id="header">
+		<div class="" style="margin:0 10px;text-align:center;">
+			<a href="#popover" id="" class="" onclick="jumpToSetting()"><span class="mui-icon mui-icon-contact font-30"></span></a>
+			<div class="mui-input-row mui-search display-inline">
+	    		<input type="search" class="mui-input-clear mui-input-speech" placeholder="搜地点" id="ser">
+			</div>
+			 <!--<span class="mui-icon mui-icon-plusempty font-30" id="add"></span>-->
+        <!--<button type="button" class="bt" onclick="jumpToAddzuView()"id="jumpToDetail">足迹</button>-->
+        
+        	<a href="#" id="open" class="" onclick="reload()"><span class="mui-icon mui-icon-refreshempty font-30" ></span></a>
+        <!--<button type="button" class="bt" onclick="jumpToAddzuView()"id="jumpToDetail"><span class="mui-icon mui-icon-plusempty font-30"></span></button>-->
+</header>
+
+		
+		<div id="map" >地图加载中...</div>
+				
+
+		<script type="text/javascript">
+
+		</script>
+</body>
+
+</html>

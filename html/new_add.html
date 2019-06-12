@@ -1,0 +1,317 @@
+<!doctype html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<link href="../css/mui.css" rel="stylesheet" />
+	</head>
+
+	<body>
+		   <script src="https://cdn.wilddog.com/js/client/current/wilddog.js"></script>
+		<script src="../js/mui.js"></script>
+		<script src="../js/jquery.js"></script>
+		<script src="../js/mui.picker.min.js"></script>
+		<link rel="stylesheet" type="text/css" href="../css/mui.picker.min.css" />
+		<script src="../js/app.js"></script>
+		<script src="../js/exif-js-master/exif.js"></script>
+		<style type="text/css">
+			*{
+				font-size:16px;
+			}
+			.title{
+				background-color: rgba(0,0,0,.25);
+				font-weight: 400;
+			}
+			
+			#popover{
+				min-width: 282px;
+			}
+			
+			.mui-popover .mui-popover-arrow{
+				display: none !important;
+			}
+			
+			.operate{
+				text-align: center;
+				margin-top: 3px;
+			}
+			.p-label{
+				font-family: 'Helvetica Neue', Helvetica, sans-serif;
+			    line-height: 1.1;
+			    float: left;
+			    width: 35%;
+			    padding: 11px 15px 0 15px;
+			      font-size: 17px;
+			    color: #000;
+			}
+			#a_record{
+				border:1px solid #ddd;
+				border-radius:5px;
+				margin:8px;
+				width:97%;
+			}
+		</style>
+		<script type="text/javascript">
+			mui.init();
+
+		</script>
+			<header class="mui-bar mui-bar-nav">
+			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+			<h1 class="mui-title">添加足迹</h1>
+			<a id="add_div" class="operate mui-pull-right" style="margin-top:6px;">
+			<button  class="" id="add" style="margin-right: 30px;background-color: transparent;border: none; color: #007aff;font-size: 16px;">保存</button>
+					
+			</a>
+		</header>
+		<div id="new_add" class="mui-content" style="margin:0px auto; height:400px">			
+			<div class="mui-content-padded">
+				
+				<form class="mui-input-group" style="">
+					<div class="mui-input-row">
+						<label>标题：</label>
+						<input type="text" class="mui-input-clear" id="a_title" placeholder="请输入">
+					</div>
+					<div class="mui-input-row">
+						<label>开始时间：</label>
+						<input type="text" class="btn mui-input-clear" data-options='{}' id="a_stime" placeholder="请选择">
+						<!--<button id='demo1' data-options='{}' class="btn mui-btn mui-btn-block">选择日期时间 ...</button>-->
+					</div>
+					<div class="mui-input-row">
+						<label>结束时间：</label>
+						<input type="text" class="btn1 mui-input-clear" data-options='{}' id="a_etime" placeholder="请选择">
+						<!--<button id='demo1' data-options='{}' class="btn mui-btn mui-btn-block">选择日期时间 ...</button>-->
+					</div>
+					<div class="mui-input-row">
+						<label>餐饮：</label>
+						<input type="text" class="mui-input-clear" id="a_food" placeholder="请输入">
+					</div>
+					<div class="mui-input-row">
+						<label>住宿：</label>
+						<input type="text" class="mui-input-clear" id="a_house" placeholder="请输入">
+					</div>
+					<div class="mui-input-row">
+						<label>同伴：</label>
+						<input type="text" class="mui-input-clear" id="a_friend" placeholder="请输入">
+					</div>
+						<p class="p-label">描述：</p>
+							<textarea  rows="5" placeholder="请在此处添加描述" id="a_record"></textarea>
+						<input type="hidden" class="mui-input-clear" id="a_image" placeholder="请输入">
+						<div class="mui-btn mui-btn-blue" onclick="galleryImg()">从相册中单选图片</div>
+						<div id="photo"><img src="../images/IMG_20180531_205113.jpg" id="z_img" style="display:none;"/></div>
+						<span id="suss">未选择</span>
+					<div class="mui-input-row">
+						<span style="position:absolute;top:12px;">允许所有人查看：</span>
+						<input type="hidden" id="isSee" placeholder="请输入">
+						<div class="mui-switch mui-switch-mini mui-active ">
+							<div class="mui-switch-handle"></div>
+						</div>
+					</div>
+					</form>
+					<!--<div id="add_div" class="operate">
+						<button type="button" class="mui-btn mui-btn-blue" id="add"style="margin-right: 30px;">保存</button>
+					
+					</div>-->
+				
+				
+			</div>
+		</div>
+		
+		<script>
+			var a_title = document.getElementById("a_title");
+			var a_record = document.getElementById("a_record");
+			var a_stime = document.getElementById("a_stime");
+			var a_food = document.getElementById("a_food");
+			var a_house = document.getElementById("a_house");
+			var a_image = document.getElementById("a_image");
+			var a_friend = document.getElementById("a_friend");
+			var a_etime = document.getElementById("a_etime");
+			var add_div = document.getElementById("add_div");
+			var edit_div = document.getElementById("edit_div");
+			var suss = document.getElementById("suss");
+			var isSee = document.getElementById("isSee");
+			var title = document.getElementById("title");
+			var photo = $("#photo");
+			var z_img = $("#z_img");
+			var state=app.getState();
+			var uname=state.account;
+			var ws=null;
+			var dplace=null;
+			console.log(a_stime.value);
+			console.log(a_record.value);
+//		    	EXIF.getData(z_img,function(){
+//				var	exif=JSON.stringify(EXIF.getAllTags(this));
+//				console.log(exif);
+//		    	});
+		function galleryImg(){
+			// 从相册中选择图片
+		    plus.gallery.pick(function(path){
+		    	a_image.value=path;
+		    	suss.innerHTML="成功";
+		    	console.log(suss.innerHTML);
+  				var	exif=EXIF.getAllTags(path);
+  				console.log(exif);
+		    }, function(e){
+		    	mui.toast('取消选择图片');
+		    }, {filter:'image'});
+		}
+		(function($) {
+				$.init();
+				window.addEventListener('new_add', function(e) {
+					var state = app.getState();
+					dplace=e.detail.dplace;
+				}, false);
+				var btns = $('.btn');
+				var btns1 = $('.btn1');
+				btns.each(function(i, btn) {
+					btn.addEventListener('tap', function() {
+						var _self = this;
+						if(_self.picker) {
+							_self.picker.show(function (rs) {
+								a_stime.value = rs.text;
+								_self.picker.dispose();
+								_self.picker = null;
+							});
+						} else {
+							var optionsJson = this.getAttribute('data-options') || '{}';
+							var options = JSON.parse(optionsJson);
+							var id = this.getAttribute('id');
+							_self.picker = new $.DtPicker(options);
+							_self.picker.show(function(rs) {
+								a_stime.value = rs.text;
+								_self.picker.dispose();
+								_self.picker = null;
+							});
+						}
+						
+					}, false);
+				});
+				btns1.each(function(i, btn) {
+					btn.addEventListener('tap', function() {
+						var _self = this;
+						if(_self.picker) {
+							_self.picker.show(function (rs) {
+								a_etime.value = rs.text;
+								_self.picker.dispose();
+								_self.picker = null;
+							});
+						} else {
+							var optionsJson = this.getAttribute('data-options') || '{}';
+							var options = JSON.parse(optionsJson);
+							var id = this.getAttribute('id');
+							_self.picker = new $.DtPicker(options);
+							_self.picker.show(function(rs) {
+								a_etime.value = rs.text;
+								_self.picker.dispose();
+								_self.picker = null;
+							});
+						}
+						
+					}, false);
+				});
+			})(mui);						
+			function trim(str){ //删除左右两端的空格
+		　　     return str.replace(/(^\s*)|(\s*$)/g, "");
+		　　 }
+			document.getElementById("add").addEventListener('tap', function() {
+					var check = true;
+						if(!a_title.value||trim(a_title.value)==""){
+							var label = a_title.previousElementSibling;
+							mui.alert(label.innerText+"不允许为空");
+							check = false;
+						}
+				
+					if(check){	
+				var d1;
+			var d2;
+			var minutes;
+			if(a_stime.value==""&&a_etime.value!=""){
+			 d1=new Date(a_etime.value);
+			 d2=new Date(a_etime.value);
+			 minutes=parseInt(d2-d1)/1000/60;
+			}
+			else if(a_etime.value==""&&a_stime.value!=""){
+				d1=new Date(a_stime.value);
+			 d2=new Date(a_stime.value);
+			 minutes=parseInt(d2-d1)/1000/60;
+			}
+			else if(a_etime.value==""&&a_stime.value==""){
+				minutes=0;
+			}
+			else{
+				d1=new Date(a_stime.value);
+			 d2=new Date(a_etime.value);
+			 minutes=parseInt(d2-d1)/1000/60;
+			}
+			if(minutes<0){
+				minutes=-minutes;
+			}
+				if(state.account==undefined){
+				alert("请登录");
+				}
+				else{	var url="http://192.168.43.189:88/zujidata/add.php";
+			      	mui.ajax(url,{
+			      		type:"post",
+			      		data: {dtitle:a_title.value,
+			      			drecord:a_record.value,
+			      			dtime:a_stime.value,
+			      			dfood:a_food.value,
+			      			dhouse:a_house.value,
+			      			dimage: a_image.value,
+			      			dfriend: a_friend.value,
+			      			detime:a_etime.value,
+			      			dminutes:minutes,
+			      			isSee: isSee.value,
+			      			dplace:dplace,
+			      			uname:uname},
+			      		crossDomain:true,
+			      		dataType: 'json',
+			      		success:function(data){
+			      			console.log(data.code);
+			      			if(data.code=="1"){
+								//关闭modal						
+								mui.alert("添加成功~");
+								a_title.value="";
+								a_record.value="";
+								a_stime.value="";
+								a_food.value="";
+								a_house.value="";
+								a_image.value="";
+								a_friend.value="";
+								a_etime.value="";
+								dplace="";
+								mui.openWindow({
+									url:'../index.html',
+									id:'index.html'
+								});
+							
+			      			}	
+			      			else{
+			      				mui.alert("添加失败~");
+			      			}
+			      		},
+			      		error:function(xhr,type,errorThrown){
+			      			mui.alert("network");
+			      			console.log(type);
+			      		}
+			      	});						
+					}
+				}
+			});
+			mui('#new_add .mui-switch').each(function() { //循环所有toggle
+				//toggle.classList.contains('mui-active') 可识别该toggle的开关状态
+				this.parentNode.querySelector('input').value = this.classList.contains('mui-active') ? 1 : 0;
+				/**
+				 * toggle 事件监听
+				 */
+				this.addEventListener('toggle', function(event) {
+					//event.detail.isActive 可直接获取当前状态
+					this.parentNode.querySelector('input').value = event.detail.isActive ? 1 : 0;
+				});
+			});
+			
+		</script>
+	</body>
+
+</html>
